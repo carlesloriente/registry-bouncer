@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&#x1f6e1;&#xfe0f; Registry Bouncer &lpar;NPM Registry Scanner&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="️-registry-bouncer-npm-registry-scanner">🛡️ Registry Bouncer (NPM Registry Scanner)</h1>
+<p><a href="https://github.com/marketplace/actions/registry-bouncer"><img src="https://img.shields.io/badge/Marketplace-Registry%20Bouncer-blue?logo=github" alt="GitHub Marketplace"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
+<p><strong>Registry Bouncer</strong> is a zero-configuration GitHub Action that blocks NPM supply chain attacks by scanning your <code>package-lock.json</code> for unauthorized or rogue registries.</p>
+<p>This action was built to defend against sophisticated Web3 and crypto-drainer malware that hide malicious packages inside deep dependency trees by bypassing the official NPM registry.</p>
+<h2 id="-features">✨ Features</h2>
+<ul>
+<li><strong>Zero-Config Installation:</strong> Drop it into your workflow and it works immediately.</li>
+<li><strong>Pre-Install Execution:</strong> Parses <code>package-lock.json</code> <em>without</em> running <code>npm install</code>, ensuring malicious <code>postinstall</code> scripts never execute on your CI runners.</li>
+<li><strong>Blocks Malicious PRs:</strong> Immediately fails the workflow run if an unauthorized registry URL is found, preventing the code from being merged.</li>
+<li><strong>Beautiful UI Reports:</strong> Generates a detailed Markdown table directly in your GitHub Actions Job Summary showing exactly which packages failed the check.</li>
+</ul>
+<hr>
+<h2 id="-usage">🚀 Usage</h2>
+<p>Using Registry Bouncer is incredibly simple. Add the following step to any of your existing GitHub Actions workflows (e.g., <code>.github/workflows/security.yml</code>).</p>
+<pre><code class="language-yaml"><span class="hljs-attr">name:</span> <span class="hljs-string">Security</span> <span class="hljs-string">Checks</span>
+
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [ <span class="hljs-string">&quot;main&quot;</span> ]
+  <span class="hljs-attr">pull_request:</span>
+    <span class="hljs-attr">branches:</span> [ <span class="hljs-string">&quot;main&quot;</span> ]
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">scan-lockfile:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">Scan</span> <span class="hljs-string">Lockfile</span> <span class="hljs-string">Registries</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">Code</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Run</span> <span class="hljs-string">Registry</span> <span class="hljs-string">Bouncer</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">carlesloriente/registry-bouncer@v1.0.0</span>
+
+</code></pre>
+<h2 id="️-how-it-works">⚙️ How It Works</h2>
+<p>Attackers often use &quot;Typo-squatting&quot; or &quot;Dependency Confusion&quot; to alter a project's <code>package-lock.json</code>. They change the <code>resolved</code> URL of a common package to point to their own server (e.g., <code>https://scammer-server.com/malicious-package.tgz</code>).</p>
+<p>When Registry Bouncer runs, it:</p>
+<ol>
+<li>Opens your <code>package-lock.json</code> directly.</li>
+<li>Extracts every <code>resolved</code> URL for your entire dependency tree.</li>
+<li>Checks the URLs against a strict whitelist of trusted package registries (NPM, Yarn, GitHub Packages).</li>
+<li>Exits with code <code>1</code> (blocking the merge) if an unknown registry is detected.</li>
+</ol>
+<hr>
+<h2 id="-example-output">📊 Example Output</h2>
+<p>When a malicious package is detected, Registry Bouncer creates a report in your <strong>GitHub Actions Step Summary</strong>:</p>
+<h3 id="-unauthorized-packages-detected">🚨 Unauthorized Packages Detected</h3>
+<p>❌ <strong>Status:</strong> Failed! Found packages from unauthorized registries.</p>
+<table>
+<thead>
+<tr>
+<th>Package Name</th>
+<th>Resolved URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>keccak256-helper</code></td>
+<td><code>https://untrusted-domain.net/keccak256-helper-1.3.2.tgz</code></td>
+</tr>
+<tr>
+<td><code>ethers-utils-core</code></td>
+<td><code>http://malicious-registry.com/ethers-utils.tgz</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="-contributing">🤝 Contributing</h2>
+<p>Contributions, issues, and feature requests are welcome!
+Feel free to check out the <a href="https://www.google.com/search?q=https://github.com/carlesloriente/registry-bouncer/issues">issues page</a> if you want to contribute.</p>
+<ol>
+<li>Fork the Project</li>
+<li>Create your Feature Branch (<code>git checkout -b feature/AmazingFeature</code>)</li>
+<li>Commit your Changes (<code>git commit -m 'Add some AmazingFeature'</code>)</li>
+<li>Push to the Branch (<code>git push origin feature/AmazingFeature</code>)</li>
+<li>Open a Pull Request</li>
+</ol>
+<hr>
+<h2 id="-license">📝 License</h2>
+<p>Distributed under the MIT License. See <code>LICENSE</code> for more information.</p>
+
+            
+            
+        </body>
+        </html>

@@ -1,0 +1,9 @@
+name: 'Registry Bouncer'
+description: 'Blocks NPM supply chain attacks by scanning package-lock.json for unauthorized registries.'
+author: 'carlesloriente' # or your GitHub handle
+branding:
+  icon: 'shield'
+  color: 'blue'
+runs:
+  using: 'node20'
+  main: 'scripts/scan-registry.js'
