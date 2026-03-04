@@ -1,14 +1,78 @@
 const fs = require('fs');
+const { execSync } = require('child_process'); // NEW: Import this to run Git commands
 
-// Define the registries you trust
-const ALLOWED_REGISTRIES = [
-  'https://registry.npmjs.org/',
-  'https://npm.pkg.github.com/', // If you use GitHub Packages
-  'https://registry.yarnpkg.com/' // If you use Yarn's mirror
-];
+// ... (keep the top part of your script the same) ...
+
+  if (unauthorizedPackages.length === 0) {
+    reportMarkdown += `✅ **Status:** Passed. All packages are resolved from trusted registries.\n`;
+    console.log("✅ Scan passed!");
+  } else {
+    reportMarkdown += `❌ **Status:** Failed! Found packages from unauthorized registries.\n\n`;
+    // ... (keep the table generation the same) ...
+
+    // --- NEW: Check the parameter to see if we should create a report ---
+    const shouldCreateReport = process.env.INPUT_CREATE_PAGES_REPORT === 'true';
+
+    if (shouldCreateReport) {
+      console.log("📝 'create_pages_report' is enabled. Generating blog post...");
+      
+      const date = new Date().toISOString().split('T')[0];
+      const timestamp = new Date().toISOString();
+      const frontMatter = `---
+layout: post
+title: "🚨 Security Alert: Rogue NPM Registry Blocked"
+date: ${timestamp}
+categories: security-alert
+---
+
+A supply chain attack attempt was automatically blocked by **Registry Bouncer**.
+
+`;
+      if (!fs.existsSync('_posts')) fs.mkdirSync('_posts');
+      const fileName = `_posts/${date}-rogue-registry-blocked-${Date.now()}.md`;
+      fs.writeFileSync(fileName, frontMatter + reportMarkdown);
+      
+      // Run the Git commands directly from inside the Action!
+      try {
+        console.log("🚀 Committing report to the repository...");
+        execSync('git config --global user.name "Registry Bouncer Bot"');
+        execSync('git config --global user.email "actions@github.com"');
+        execSync('git add _posts/');
+        execSync('git commit -m "🚨 Security Advisory: Automated malware report added"');
+        execSync('git push');
+        console.log("✅ Successfully committed report to GitHub Pages!");
+      } catch (error) {
+        console.error("⚠️ Failed to commit automatically. Did you add 'permissions: contents: write' to your workflow?");
+      }
+    }
+  }
+
+  // Write to GitHub Actions UI
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, reportMarkdown);
+  }
+
+  // Exit with code 1 to BLOCK the merge
+  if (unauthorizedPackages.length > 0) {
+    process.exit(1);
+  }
 
 try {
   console.log("🔍 Starting lockfile registry scan...");
+
+  // --- NEW: Check if the lockfile exists first ---
+  if (!fs.existsSync('package-lock.json')) {
+    console.log("⏭️ No package-lock.json found. Skipping scan.");
+    
+    // Write a nice summary so the user knows it was skipped, not broken
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## 🛡️ NPM Registry Security Scan\n⏭️ **Skipped:** No \`package-lock.json\` found in this repository.`);
+    }
+    
+    process.exit(0); // Exit successfully so the workflow stays green!
+  }
+
+  // If it exists, proceed with parsing...
   const lockfile = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
   const unauthorizedPackages = [];
   let totalScanned = 0;
