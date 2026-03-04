@@ -32,7 +32,7 @@ try {
     }
   }
 
-  // --- Generate the "Cool Report" for GitHub Actions ---
+// --- Generate the "Cool Report" ---
   let reportMarkdown = `## 🛡️ NPM Registry Security Scan\n\n`;
   reportMarkdown += `**Total Packages Scanned:** ${totalScanned}\n`;
 
@@ -47,16 +47,40 @@ try {
     
     unauthorizedPackages.forEach(pkg => {
       reportMarkdown += `| \`${pkg.name}\` | \`${pkg.resolved}\` |\n`;
-      console.error(`🚨 Unauthorized registry found for package: ${pkg.name} -> ${pkg.resolved}`);
     });
+
+    // --- NEW: Create a GitHub Pages Blog Post ---
+    const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const timestamp = new Date().toISOString();
+    
+    // Jekyll Front Matter (Metadata for GitHub Pages)
+    const frontMatter = `---
+layout: post
+title: "🚨 Security Alert: Rogue NPM Registry Blocked"
+date: ${timestamp}
+categories: security-alert
+---
+
+A supply chain attack attempt was automatically blocked by **Registry Bouncer**.
+
+`;
+    // Create the _posts directory if it doesn't exist
+    if (!fs.existsSync('_posts')) {
+      fs.mkdirSync('_posts');
+    }
+
+    // Save the file (e.g., _posts/2026-03-04-rogue-registry-blocked.md)
+    const fileName = `_posts/${date}-rogue-registry-blocked-${Date.now()}.md`;
+    fs.writeFileSync(fileName, frontMatter + reportMarkdown);
+    console.log(`📝 Blog post generated at: ${fileName}`);
   }
 
-  // Write the markdown report to the GitHub Step Summary UI
+  // Write to GitHub Actions UI
   if (process.env.GITHUB_STEP_SUMMARY) {
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, reportMarkdown);
   }
 
-  // Exit with code 1 to BLOCK the merge if unauthorized packages were found
+  // Exit with code 1 to BLOCK the merge
   if (unauthorizedPackages.length > 0) {
     process.exit(1);
   }

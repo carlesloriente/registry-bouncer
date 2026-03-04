@@ -1,4 +1,4 @@
-name: "Security: NPM Registry Scanner"
+name: Security Checks
 
 on:
   push:
@@ -6,11 +6,14 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# WE NEED THIS: Give the action permission to push code back to the repo
+permissions:
+  contents: write
+
 jobs:
   scan-lockfile:
-    name: Scan package-lock.json
+    name: Scan Lockfile Registries
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -20,5 +23,22 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run Lockfile Registry Scan
+      - name: Run Registry Bouncer
         run: node scripts/scan-registry.js
+
+      # NEW: This step ONLY runs if the previous step failed (malware found)
+      - name: Publish Alert to GitHub Pages
+        if: failure() 
+        run: |
+          echo "Malware detected! Committing the report to the blog..."
+          
+          # Setup a bot user to make the commit
+          git config --global user.name "Registry Bouncer Bot"
+          git config --global user.email "actions@github.com"
+          
+          # Add the new blog post file
+          git add _posts/
+          
+          # Commit and push
+          git commit -m "🚨 Security Advisory: Automated malware report added"
+          git push
