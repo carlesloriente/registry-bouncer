@@ -115,6 +115,16 @@ When a malicious package is detected, Registry Bouncer creates a report in your 
 
 ---
 
+## 🎮 Live Demo
+
+Want to see exactly how Registry Bouncer stops an attack in a real CI/CD pipeline?
+
+Check out the [Registry Bouncer Demo Repository](https://github.com/carlesloriente/polymarket-copy-bot-ts-registry-bouncer-demo).
+
+This demo uses a recreated, defanged version of the original malicious Polymarket bot that inspired this tool. You can check the repository's **Actions** tab or **Pull Requests** to see the Bouncer catching the rogue `keccak256-helper` dependency, blocking the merge, and generating the automated Markdown report!
+
+---
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
